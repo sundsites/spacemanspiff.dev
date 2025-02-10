@@ -70,6 +70,15 @@
             font-size: 18px;
             font-weight: bold;
         }
+        .image-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ccc;
+        }
     </style>
 </head>
 <body>
@@ -88,6 +97,9 @@
 
     <!-- Display selected date -->
     <div id="selected-date" class="selected-date"></div>
+
+    <!-- Image container to display selected image -->
+    <div id="image-container" class="image-container"></div>
 
     <script>
         const years = Array.from({ length: 11 }, (_, i) => 2000 + i); // 2000 to 2010
@@ -166,10 +178,22 @@
         function selectDate(year, month, day) {
             const selectedDateDiv = document.getElementById('selected-date');
             const selectedDate = `${months[month]} ${day}, ${year}`;
-            const imageUrl = `get_image.php?year=${year}&month=${month + 1}&day=${day}`;
+            const imageUrl = generateImageUrl(year, month + 1, day);
             
             // Display the link to get the image
-            selectedDateDiv.innerHTML = `Selected Date: <a href="${imageUrl}" target="_blank">${selectedDate}</a>`;
+            selectedDateDiv.innerHTML = `Selected Date: <a href="#" onclick="displayImage('${imageUrl}')">${selectedDate}</a>`;
+        }
+
+        function generateImageUrl(year, month, day) {
+            return `/images/${year}_${month < 10 ? '0' + month : month}_${day < 10 ? '0' + day : day}.jpg`;
+        }
+
+        function displayImage(imageUrl) {
+            const imageContainer = document.getElementById('image-container');
+            const imageElement = document.createElement('img');
+            imageElement.src = imageUrl;
+            imageContainer.innerHTML = '';  // Clear any previous image
+            imageContainer.appendChild(imageElement);
         }
 
         // Initialize the year menu
