@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Year-Month-Day Calendar</title>
+    <title>Spaceman Spiff DEV</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -74,7 +74,9 @@
 </head>
 <body>
 
-    <h1>Select Year, Month, and Day</h1>
+    <h1>Spaceman Spiff DEV</h1>
+
+    <h2>version 0.0.1</h2>
 
     <div id="year-menu" class="year-menu"></div>
 
@@ -164,7 +166,10 @@
         function selectDate(year, month, day) {
             const selectedDateDiv = document.getElementById('selected-date');
             const selectedDate = `${months[month]} ${day}, ${year}`;
-            selectedDateDiv.innerHTML = `Selected Date: <a href="#" onclick="alert('You selected: ${selectedDate}')">${selectedDate}</a>`;
+            const imageUrl = `get_image?year=${year}&month=${month + 1}&day=${day}`;
+            
+            // Display the link to get the image
+            selectedDateDiv.innerHTML = `Selected Date: <a href="${imageUrl}" target="_blank">${selectedDate}</a>`;
         }
 
         // Initialize the year menu
