@@ -3,18 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Index Menu</title>
+    <title>Year-Month-Day Menu</title>
     <style>
         .submenu { display: none; }
-        .menu { margin: 5px 0; cursor: pointer; }
+        .menu { margin: 5px 10px; cursor: pointer; display: inline-block; }
         .menu:hover { color: blue; }
         .submenu li { padding-left: 20px; }
+        #year-menu { margin-bottom: 20px; }
+        .year-item { display: inline-block; padding: 10px; cursor: pointer; border: 1px solid #ccc; margin: 5px; }
+        .year-item:hover { background-color: #f0f0f0; }
+        .month-item { padding: 5px 10px; cursor: pointer; }
     </style>
 </head>
 <body>
     <h1>Select Year, Month, and Day</h1>
 
     <div id="year-menu"></div>
+    <div id="month-day-menu"></div>
 
     <script>
         // Define the years, months, and days data
@@ -35,50 +40,51 @@
             const yearMenu = document.getElementById('year-menu');
             years.forEach(year => {
                 const yearElement = document.createElement('div');
-                yearElement.classList.add('menu');
+                yearElement.classList.add('year-item');
                 yearElement.innerText = year;
-                yearElement.onclick = () => toggleSubmenu(yearElement, `month-menu-${year}`);
-                
-                // Create month menu
-                const monthMenu = document.createElement('ul');
-                monthMenu.id = `month-menu-${year}`;
-                monthMenu.classList.add('submenu');
-                months.forEach((month, index) => {
-                    const monthItem = document.createElement('li');
-                    monthItem.classList.add('menu');
-                    monthItem.innerText = month;
-                    monthItem.onclick = (e) => {
-                        e.stopPropagation();
-                        toggleSubmenu(monthItem, `day-menu-${year}-${index}`);
-                    };
-
-                    // Create day menu for each month
-                    const dayMenu = document.createElement('ul');
-                    dayMenu.id = `day-menu-${year}-${index}`;
-                    dayMenu.classList.add('submenu');
-                    getDaysInMonth(year, index + 1).forEach(day => {
-                        const dayItem = document.createElement('li');
-                        dayItem.classList.add('menu');
-                        dayItem.innerText = day;
-                        dayMenu.appendChild(dayItem);
-                    });
-
-                    monthItem.appendChild(dayMenu);
-                    monthMenu.appendChild(monthItem);
-                });
-                
-                yearElement.appendChild(monthMenu);
+                yearElement.onclick = () => showMonthMenu(year);
                 yearMenu.appendChild(yearElement);
             });
         }
 
-        // Toggle submenu visibility
-        function toggleSubmenu(clickedElement, submenuId) {
-            const submenu = document.getElementById(submenuId);
-            submenu.style.display = (submenu.style.display === 'block') ? 'none' : 'block';
+        // Show month menu when a year is clicked
+        function showMonthMenu(year) {
+            const monthDayMenu = document.getElementById('month-day-menu');
+            monthDayMenu.innerHTML = ''; // Clear the previous content
+
+            const monthMenu = document.createElement('div');
+            monthMenu.innerHTML = `<strong>Months for ${year}:</strong><br>`;
+
+            months.forEach((month, index) => {
+                const monthItem = document.createElement('div');
+                monthItem.classList.add('month-item');
+                monthItem.innerText = month;
+                monthItem.onclick = () => showDayMenu(year, index);
+                monthMenu.appendChild(monthItem);
+            });
+
+            monthDayMenu.appendChild(monthMenu);
         }
 
-        // Initialize the menu
+        // Show day menu when a month is clicked
+        function showDayMenu(year, monthIndex) {
+            const monthDayMenu = document.getElementById('month-day-menu');
+            const days = getDaysInMonth(year, monthIndex + 1);
+
+            const dayMenu = document.createElement('div');
+            dayMenu.innerHTML = `<strong>Days in ${months[monthIndex]} ${year}:</strong><br>`;
+
+            days.forEach(day => {
+                const dayItem = document.createElement('div');
+                dayItem.classList.add('menu');
+                dayItem.innerText = day;
+                dayMenu.appendChild(dayItem);
+            });
+
+            monthDayMenu.appendChild(dayMenu);
+        }
+
+        // Initialize the year menu
         createYearMenu();
     </script>
 </body>
