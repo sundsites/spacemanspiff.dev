@@ -65,6 +65,11 @@
         .calendar .day:hover {
             background-color: #f0f0f0;
         }
+        .selected-date {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -78,6 +83,9 @@
 
     <!-- Calendar -->
     <div id="calendar" class="calendar"></div>
+
+    <!-- Display selected date -->
+    <div id="selected-date" class="selected-date"></div>
 
     <script>
         const years = Array.from({ length: 11 }, (_, i) => 2000 + i); // 2000 to 2010
@@ -140,7 +148,7 @@
                 const dayCell = document.createElement('div');
                 dayCell.classList.add('day');
                 dayCell.innerText = day;
-                dayCell.onclick = () => alert(`You selected: ${day} ${months[monthIndex]} ${year}`);
+                dayCell.onclick = () => selectDate(year, monthIndex, day);
                 dayGrid.appendChild(dayCell);
             });
 
@@ -151,6 +159,12 @@
         function getDaysInMonth(year, month) {
             const date = new Date(year, month, 0);
             return Array.from({ length: date.getDate() }, (_, i) => i + 1);
+        }
+
+        function selectDate(year, month, day) {
+            const selectedDateDiv = document.getElementById('selected-date');
+            const selectedDate = `${months[month]} ${day}, ${year}`;
+            selectedDateDiv.innerHTML = `Selected Date: <a href="#" onclick="alert('You selected: ${selectedDate}')">${selectedDate}</a>`;
         }
 
         // Initialize the year menu
