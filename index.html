@@ -3,86 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Year-Month-Day Menu</title>
+    <title>Year-Month-Day Calendar</title>
     <style>
-        .submenu { display: none; }
-        .menu { margin: 5px 10px; cursor: pointer; display: inline-block; }
-        .menu:hover { color: blue; }
-        .submenu li { padding-left: 20px; }
-        #year-menu { margin-bottom: 20px; }
-        .year-item { display: inline-block; padding: 10px; cursor: pointer; border: 1px solid #ccc; margin: 5px; }
-        .year-item:hover { background-color: #f0f0f0; }
-        .month-item { padding: 5px 10px; cursor: pointer; }
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .menu {
+            margin: 5px 10px;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .menu:hover {
+            color: blue;
+        }
+        .year-menu {
+            margin-bottom: 20px;
+        }
+        .year-item {
+            display: inline-block;
+            padding: 10px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            margin: 5px;
+        }
+        .year-item:hover {
+            background-color: #f0f0f0;
+        }
+        .month-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .month-item {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+            cursor: pointer;
+        }
+        .month-item:hover {
+            background-color: #f0f0f0;
+        }
+        .calendar {
+            margin-top: 20px;
+            text-align: center;
+            border: 1px solid #ccc;
+            padding: 20px;
+        }
+        .calendar .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        .calendar .day {
+            padding: 5px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .calendar .day:hover {
+            background-color: #f0f0f0;
+        }
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            z-index: 1000;
+            display: none;
+        }
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+        .close-btn {
+            background-color: #f44336;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
+
     <h1>Select Year, Month, and Day</h1>
 
-    <div id="year-menu"></div>
-    <div id="month-day-menu"></div>
+    <div id="year-menu" class="year-menu"></div>
+
+    <!-- Popup for Month Selection -->
+    <div id="month-popup" class="popup">
+        <div id="month-grid" class="month-grid"></div>
+        <button id="close-month-popup" class="close-btn">Close</button>
+    </div>
+    <div id="overlay" class="popup-overlay"></div>
+
+    <!-- Popup for Calendar Display -->
+    <div id="calendar-popup" class="popup">
+        <div id="calendar" class="calendar"></div>
+        <button id="close-calendar-popup" class="close-btn">Close</button>
+    </div>
 
     <script>
-        // Define the years, months, and days data
         const years = Array.from({ length: 11 }, (_, i) => 2000 + i); // 2000 to 2010
         const months = [
             'January', 'February', 'March', 'April', 'May', 'June',
             'July', 'August', 'September', 'October', 'November', 'December'
         ];
 
-        // Function to generate the days of a given month
-        function getDaysInMonth(year, month) {
-            const date = new Date(year, month, 0);
-            return Array.from({ length: date.getDate() }, (_, i) => i + 1);
-        }
-
-        // Function to create the year menu
         function createYearMenu() {
             const yearMenu = document.getElementById('year-menu');
             years.forEach(year => {
                 const yearElement = document.createElement('div');
                 yearElement.classList.add('year-item');
                 yearElement.innerText = year;
-                yearElement.onclick = () => showMonthMenu(year);
+                yearElement.onclick = () => showMonthPopup(year);
                 yearMenu.appendChild(yearElement);
             });
         }
 
-        // Show month menu when a year is clicked
-        function showMonthMenu(year) {
-            const monthDayMenu = document.getElementById('month-day-menu');
-            monthDayMenu.innerHTML = ''; // Clear the previous content
-
-            const monthMenu = document.createElement('div');
-            monthMenu.innerHTML = `<strong>Months for ${year}:</strong><br>`;
+        function showMonthPopup(year) {
+            const monthPopup = document.getElementById('month-popup');
+            const monthGrid = document.getElementById('month-grid');
+            monthGrid.innerHTML = ''; // Clear previous months
 
             months.forEach((month, index) => {
-                const monthItem = document.createElement('div');
-                monthItem.classList.add('month-item');
-                monthItem.innerText = month;
-                monthItem.onclick = () => showDayMenu(year, index);
-                monthMenu.appendChild(monthItem);
+                const monthElement = document.createElement('div');
+                monthElement.classList.add('month-item');
+                monthElement.innerText = month;
+                monthElement.onclick = () => showCalendar(year, index);
+                monthGrid.appendChild(monthElement);
             });
 
-            monthDayMenu.appendChild(monthMenu);
+            document.getElementById('overlay').style.display = 'block';
+            monthPopup.style.display = 'block';
         }
 
-        // Show day menu when a month is clicked
-        function showDayMenu(year, monthIndex) {
-            const monthDayMenu = document.getElementById('month-day-menu');
-            const days = getDaysInMonth(year, monthIndex + 1);
+        function showCalendar(year, monthIndex) {
+            const calendarPopup = document.getElementById('calendar-popup');
+            const calendar = document.getElementById('calendar');
+            calendar.innerHTML = ''; // Clear previous calendar
 
-            const dayMenu = document.createElement('div');
-            dayMenu.innerHTML = `<strong>Days in ${months[monthIndex]} ${year}:</strong><br>`;
+            const daysInMonth = getDaysInMonth(year, monthIndex + 1);
+            const firstDay = new Date(year, monthIndex).getDay();
 
-            days.forEach(day => {
-                const dayItem = document.createElement('div');
-                dayItem.classList.add('menu');
-                dayItem.innerText = day;
-                dayMenu.appendChild(dayItem);
+            const header = document.createElement('div');
+            header.classList.add('days');
+            ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.innerText = day;
+                header.appendChild(dayHeader);
+            });
+            calendar.appendChild(header);
+
+            const dayGrid = document.createElement('div');
+            dayGrid.classList.add('days');
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                dayGrid.appendChild(emptyCell);
+            }
+
+            daysInMonth.forEach(day => {
+                const dayCell = document.createElement('div');
+                dayCell.classList.add('day');
+                dayCell.innerText = day;
+                dayCell.onclick = () => alert(`You selected: ${day} ${months[monthIndex]} ${year}`);
+                dayGrid.appendChild(dayCell);
             });
 
-            monthDayMenu.appendChild(dayMenu);
+            calendar.appendChild(dayGrid);
+            document.getElementById('overlay').style.display = 'block';
+            calendarPopup.style.display = 'block';
         }
+
+        function getDaysInMonth(year, month) {
+            const date = new Date(year, month, 0);
+            return Array.from({ length: date.getDate() }, (_, i) => i + 1);
+        }
+
+        // Close the month popup
+        document.getElementById('close-month-popup').onclick = () => {
+            document.getElementById('month-popup').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        };
+
+        // Close the calendar popup
+        document.getElementById('close-calendar-popup').onclick = () => {
+            document.getElementById('calendar-popup').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        };
 
         // Initialize the year menu
         createYearMenu();
