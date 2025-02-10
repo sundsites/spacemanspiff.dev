@@ -166,7 +166,7 @@
         function selectDate(year, month, day) {
             const selectedDateDiv = document.getElementById('selected-date');
             const selectedDate = `${months[month]} ${day}, ${year}`;
-            const imageUrl = `get_image?year=${year}&month=${month + 1}&day=${day}`;
+            const imageUrl = `get_image.php?year=${year}&month=${month + 1}&day=${day}`;
             
             // Display the link to get the image
             selectedDateDiv.innerHTML = `Selected Date: <a href="${imageUrl}" target="_blank">${selectedDate}</a>`;
